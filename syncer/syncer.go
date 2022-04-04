@@ -1,13 +1,15 @@
 package syncer
 
 import (
+	"io/ioutil"
+
 	"github.com/geeklubcn/lark/bitable"
 	"github.com/geeklubcn/lark/define"
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
 )
 
 type Syncer interface {
+	DataSyncer
 	SchemaSyncer
 }
 
