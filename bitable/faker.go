@@ -88,3 +88,50 @@ func (f *fakerBitable) ListFields(_ *core.Context, _ string) (map[string]*larkBi
 func (f *fakerBitable) CreateField(_ *core.Context, _ string, _ *larkBitable.AppTableField) (string, error) {
 	return "fldjX7dUj5", nil
 }
+
+func (f *fakerBitable) ListRecords(_ *core.Context, _ string) (map[string]*larkBitable.AppTableRecord, error) {
+	var res map[string]*larkBitable.AppTableRecord
+	_ = json.Unmarshal([]byte(`
+{
+    "recY5PsAPc": {
+        "id": "recY5PsAPc",
+        "record_id": "recY5PsAPc",
+        "fields": {
+            "Description": "用于测试的Gitlab项目",
+            "WebUrl": {
+                "text": "https://gitlab.com/wangyuheng77/integration",
+                "link": "https://gitlab.com/wangyuheng77/integration"
+            },
+            "ID": "a",
+            "Name": "Gitlab项目"
+        }
+    },
+    "rec6KXl9eq": {
+        "id": "rec6KXl9eq",
+        "record_id": "rec6KXl9eq",
+        "fields": {
+            "WebUrl": {
+                "text": "https://gitlab.com/wangyuheng77/integration",
+                "link": "https://gitlab.com/wangyuheng77/integration"
+            },
+            "ID": "b",
+            "Name": "Gitlab项目",
+            "Description": "用于测试的Gitlab项目"
+        }
+    }
+}
+`), &res)
+	return res, nil
+}
+
+func (f *fakerBitable) BatchCreateRecord(_ *core.Context, _ string, _ *larkBitable.AppTableRecordBatchCreateReqBody) ([]string, error) {
+	return []string{"fldjX7dUj5"}, nil
+}
+
+func (f *fakerBitable) BatchUpdateRecord(_ *core.Context, _ string, _ *larkBitable.AppTableRecordBatchUpdateReqBody) error {
+	return nil
+}
+
+func (f *fakerBitable) SyncRecords(_ *core.Context, _ string, _ []map[string]interface{}) error {
+	return nil
+}

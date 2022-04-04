@@ -21,11 +21,120 @@ type Bitable interface {
 
 	ListFields(ctx *core.Context, tableId string) (map[string]*larkBitable.AppTableField, error)
 	CreateField(ctx *core.Context, tableId string, body *larkBitable.AppTableField) (string, error)
+
+	ListRecords(ctx *core.Context, tableId string) (map[string]*larkBitable.AppTableRecord, error)
+	BatchCreateRecord(ctx *core.Context, tableId string, body *larkBitable.AppTableRecordBatchCreateReqBody) ([]string, error)
+	BatchUpdateRecord(ctx *core.Context, tableId string, body *larkBitable.AppTableRecordBatchUpdateReqBody) error
+
+	SyncRecords(ctx *core.Context, tableId string, recordFields []map[string]interface{}) error
 }
 
 type bitable struct {
 	appToken string
 	service  *larkBitable.Service
+}
+
+func (b *bitable) SyncRecords(ctx *core.Context, tableId string, recordFields []map[string]interface{}) error {
+	records, err := b.ListRecords(ctx, tableId)
+	if err != nil {
+		return err
+	}
+
+	existedRecordIDs := make(map[interface{}]*larkBitable.AppTableRecord, 0)
+	for _, r := range records {
+		if id, ok := r.Fields["ID"]; ok && id != nil {
+			existedRecordIDs[id] = r
+		}
+	}
+
+	prepareCreateRecords := make([]*larkBitable.AppTableRecord, 0)
+	prepareUpdateRecords := make([]*larkBitable.AppTableRecord, 0)
+
+	for _, fields := range recordFields {
+		if r, ok := existedRecordIDs[fields["ID"]]; ok {
+			prepareUpdateRecords = append(prepareUpdateRecords, &larkBitable.AppTableRecord{
+				RecordId: r.RecordId,
+				Fields:   fields,
+			})
+		} else {
+			prepareCreateRecords = append(prepareCreateRecords, &larkBitable.AppTableRecord{
+				Fields: fields,
+			})
+		}
+	}
+
+	if len(prepareCreateRecords) > 0 {
+		_, err = b.BatchCreateRecord(ctx, tableId, &larkBitable.AppTableRecordBatchCreateReqBody{
+			Records: prepareCreateRecords,
+		})
+		if err != nil {
+			return err
+		}
+	}
+	if len(prepareUpdateRecords) > 0 {
+		err = b.BatchUpdateRecord(ctx, tableId, &larkBitable.AppTableRecordBatchUpdateReqBody{
+			Records: prepareUpdateRecords,
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (b *bitable) ListRecords(ctx *core.Context, tableId string) (map[string]*larkBitable.AppTableRecord, error) {
+	reqCall := b.service.AppTableRecords.List(ctx)
+	reqCall.SetAppToken(b.appToken)
+	reqCall.SetTableId(tableId)
+	message, err := reqCall.Do()
+	if err != nil {
+		logrus.WithContext(ctx).WithError(err).Errorf("ListRecords fail! appToken:%s,response:%s", b.appToken, tools.Prettify(message))
+		return nil, err
+	}
+	logrus.WithContext(ctx).Debugf("response:%s", tools.Prettify(message))
+	res := make(map[string]*larkBitable.AppTableRecord, len(message.Items))
+	for _, it := range message.Items {
+		res[it.RecordId] = it
+	}
+
+	return res, nil
+}
+
+func (b *bitable) BatchUpdateRecord(ctx *core.Context, tableId string, body *larkBitable.AppTableRecordBatchUpdateReqBody) error {
+	if body == nil || len(body.Records) == 0 {
+		return nil
+	}
+	reqCall := b.service.AppTableRecords.BatchUpdate(ctx, body)
+	reqCall.SetAppToken(b.appToken)
+	reqCall.SetTableId(tableId)
+	message, err := reqCall.Do()
+	if err != nil {
+		logrus.WithContext(ctx).WithError(err).Errorf("BatchUpdateRecord fail! appToken:%s,response:%s", b.appToken, tools.Prettify(message))
+		return err
+	}
+	logrus.WithContext(ctx).Debugf("response:%s", tools.Prettify(message))
+	return nil
+}
+
+func (b *bitable) BatchCreateRecord(ctx *core.Context, tableId string, body *larkBitable.AppTableRecordBatchCreateReqBody) ([]string, error) {
+	if body == nil || len(body.Records) == 0 {
+		return nil, nil
+	}
+	reqCall := b.service.AppTableRecords.BatchCreate(ctx, body)
+	reqCall.SetAppToken(b.appToken)
+	reqCall.SetTableId(tableId)
+	message, err := reqCall.Do()
+	if err != nil {
+		logrus.WithContext(ctx).Debugf("request: %s", tools.Prettify(body))
+		logrus.WithContext(ctx).WithError(err).Errorf("BatchCreateRecord fail! appToken:%s,response:%s", b.appToken, tools.Prettify(message))
+		return nil, err
+	}
+	logrus.WithContext(ctx).Debugf("response:%s", tools.Prettify(message))
+	recordIds := make([]string, 0)
+	for _, r := range message.Records {
+		recordIds = append(recordIds, r.RecordId)
+	}
+	return recordIds, nil
 }
 
 func (b *bitable) CreateField(ctx *core.Context, tableId string, body *larkBitable.AppTableField) (string, error) {
