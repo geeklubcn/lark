@@ -3,14 +3,16 @@ package syncer
 import (
 	"context"
 	"fmt"
-	"github.com/geeklubcn/lark/bitable"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/geeklubcn/lark/bitable"
+	"github.com/geeklubcn/lark/gitlab"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSchemaSyncer(t *testing.T) {
 	ctx := context.Background()
-	s := NewSyncer(bitable.FakerBitable)
+	s := NewSyncer(bitable.FakerBitable, gitlab.FakerGitlab)
 
 	t.Run("fetch remote", func(t *testing.T) {
 		def, _ := s.FetchSchemaByRemoteBitable(ctx)
