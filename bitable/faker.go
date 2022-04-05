@@ -89,6 +89,10 @@ func (f *fakerBitable) CreateField(_ *core.Context, _ string, _ *larkBitable.App
 	return "fldjX7dUj5", nil
 }
 
+func (f *fakerBitable) UpdateField(_ *core.Context, _ string, _ *larkBitable.AppTableField) error {
+	return nil
+}
+
 func (f *fakerBitable) ListRecords(_ *core.Context, _ string) (map[string]*larkBitable.AppTableRecord, error) {
 	var res map[string]*larkBitable.AppTableRecord
 	_ = json.Unmarshal([]byte(`

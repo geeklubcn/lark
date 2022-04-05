@@ -21,6 +21,7 @@ type Bitable interface {
 
 	ListFields(ctx *core.Context, tableId string) (map[string]*larkBitable.AppTableField, error)
 	CreateField(ctx *core.Context, tableId string, body *larkBitable.AppTableField) (string, error)
+	UpdateField(ctx *core.Context, tableId string, body *larkBitable.AppTableField) error
 
 	ListRecords(ctx *core.Context, tableId string) (map[string]*larkBitable.AppTableRecord, error)
 	BatchCreateRecord(ctx *core.Context, tableId string, body *larkBitable.AppTableRecordBatchCreateReqBody) ([]string, error)
@@ -148,6 +149,25 @@ func (b *bitable) CreateField(ctx *core.Context, tableId string, body *larkBitab
 	}
 	logrus.WithContext(ctx).Debugf("response:%s", tools.Prettify(message))
 	return message.Field.FieldId, nil
+}
+
+func (b *bitable) UpdateField(ctx *core.Context, tableId string, body *larkBitable.AppTableField) error {
+	reqCall := b.service.AppTableFields.Update(ctx, body)
+	reqCall.SetAppToken(b.appToken)
+	reqCall.SetTableId(tableId)
+	reqCall.SetFieldId(body.FieldId)
+	message, err := reqCall.Do()
+	if err != nil {
+		logrus.WithContext(ctx).WithError(err).WithFields(logrus.Fields{
+			"appToken": b.appToken,
+			"tableId":  tableId,
+			"body":     body,
+			"response": tools.Prettify(message),
+		}).Errorf("UpdateField fail!")
+		return err
+	}
+	logrus.WithContext(ctx).Debugf("UpdateField response:%s", tools.Prettify(message))
+	return nil
 }
 
 func NewBitable(appId string, appSecret string, appToken string) Bitable {
