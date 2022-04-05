@@ -2,6 +2,8 @@ package define
 
 import "time"
 
+type Record interface{}
+
 type RecordField interface {
 	ToField() map[string]interface{}
 }
@@ -46,10 +48,18 @@ type Issue struct {
 	UpdatedAt    time.Time
 	DueDate      time.Time
 	HealthStatus string
+	ProjectRef   *ProjectRef
+}
+
+type ProjectRef struct {
+	Text      string
+	Type      string
+	TableID   string
+	RecordIDs []string
 }
 
 func (i *Issue) ToField() map[string]interface{} {
-	return map[string]interface{}{
+	res := map[string]interface{}{
 		"ID":            i.ID,
 		"title":         i.Title,
 		"description":   i.Description,
@@ -59,6 +69,18 @@ func (i *Issue) ToField() map[string]interface{} {
 		"due_date":      i.DueDate.UnixNano() / 1e6,
 		"health_status": i.HealthStatus,
 	}
+	if i.ProjectRef != nil {
+		// TODO struct oncall
+		res["Project"] = []map[string]interface{}{
+			{
+				"text":       i.ProjectRef.Text,
+				"type":       i.ProjectRef.Type,
+				"table_id":   i.ProjectRef.TableID,
+				"record_ids": i.ProjectRef.RecordIDs,
+			},
+		}
+	}
+	return res
 }
 
 type Member struct {

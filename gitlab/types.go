@@ -1,30 +1,8 @@
 package gitlab
 
 import (
-	"strconv"
 	"time"
-
-	"github.com/geeklubcn/lark/define"
 )
-
-func (i *IssueResult) Convert() *define.Issue {
-	res := &define.Issue{
-		ID:           strconv.Itoa(i.Id),
-		Title:        i.Title,
-		Description:  i.Description,
-		State:        i.State,
-		CreatedAt:    i.CreatedAt,
-		UpdatedAt:    i.UpdatedAt,
-		HealthStatus: i.HealthStatus,
-	}
-	switch i.DueDate.(type) {
-	case string:
-		if dueData, err := time.Parse("2006-01-02", i.DueDate.(string)); err == nil {
-			res.DueDate = dueData
-		}
-	}
-	return res
-}
 
 // IssueResult https://docs.gitlab.com/ee/api/issues.html
 type IssueResult struct {
@@ -119,16 +97,16 @@ type IssueResult struct {
 
 // ProjectResult https://docs.gitlab.com/ee/api/projects.html#get-single-project
 type ProjectResult struct {
-	Id            int         `json:"id"`
-	Description   interface{} `json:"description"`
-	DefaultBranch string      `json:"default_branch"`
-	Visibility    string      `json:"visibility"`
-	SshUrlToRepo  string      `json:"ssh_url_to_repo"`
-	HttpUrlToRepo string      `json:"http_url_to_repo"`
-	WebUrl        string      `json:"web_url"`
-	ReadmeUrl     string      `json:"readme_url"`
-	TagList       []string    `json:"tag_list"`
-	Topics        []string    `json:"topics"`
+	Id            int      `json:"id"`
+	Description   string   `json:"description"`
+	DefaultBranch string   `json:"default_branch"`
+	Visibility    string   `json:"visibility"`
+	SshUrlToRepo  string   `json:"ssh_url_to_repo"`
+	HttpUrlToRepo string   `json:"http_url_to_repo"`
+	WebUrl        string   `json:"web_url"`
+	ReadmeUrl     string   `json:"readme_url"`
+	TagList       []string `json:"tag_list"`
+	Topics        []string `json:"topics"`
 	Owner         struct {
 		Id        int       `json:"id"`
 		Name      string    `json:"name"`

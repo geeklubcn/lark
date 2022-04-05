@@ -1,6 +1,7 @@
 package syncer
 
 import (
+	"github.com/geeklubcn/lark/gitlab"
 	"io/ioutil"
 
 	"github.com/geeklubcn/lark/bitable"
@@ -15,13 +16,17 @@ type Syncer interface {
 
 type syncer struct {
 	b       bitable.Bitable
+	g       gitlab.Gitlab
+	meta    Meta
 	marshal MarshalFunc
 	write   FileWriterFunc
 }
 
-func NewSyncer(b bitable.Bitable) Syncer {
+func NewSyncer(b bitable.Bitable, g gitlab.Gitlab) Syncer {
 	return &syncer{
-		b: b,
+		b:    b,
+		g:    g,
+		meta: &meta{b: b},
 		marshal: func(d *define.Define) ([]byte, error) {
 			return yaml.Marshal(d)
 		},
