@@ -115,10 +115,14 @@ func (s *syncer) syncDefineTableField(c context.Context, def *define.Define) err
 	for _, lt := range larkTables {
 		if defTable, ok := defTableMap[lt.Name]; ok {
 			larkTableFields, _ := s.b.ListFields(ctx, lt.TableId)
+			// 默认创建一个field，且不支持删除，只能编辑
+			existLen := len(larkTableFields)
+			larkTableFieldArray := make([]*larkBitable.AppTableField, 0)
+			for _, f := range larkTableFields {
+				larkTableFieldArray = append(larkTableFieldArray, f)
+			}
 
-			fields := make([]*larkBitable.AppTableField, 0)
-
-			for _, defField := range defTable.Fields {
+			for i, defField := range defTable.Fields {
 				if _, fOk := larkTableFields[defField.FieldName]; !fOk {
 					f := &larkBitable.AppTableField{
 						FieldName: defField.FieldName,
@@ -143,14 +147,13 @@ func (s *syncer) syncDefineTableField(c context.Context, def *define.Define) err
 							Fields:     defField.Property.Fields,
 						}
 					}
-
-					fields = append(fields, f)
+					if i < existLen {
+						f.FieldId = larkTableFieldArray[i].FieldId
+						_ = s.b.UpdateField(ctx, lt.TableId, f)
+					} else {
+						_, _ = s.b.CreateField(ctx, lt.TableId, f)
+					}
 				}
-			}
-
-			for _, f := range fields {
-				_, _ = s.b.CreateField(ctx, lt.TableId, f)
-
 			}
 		}
 	}
