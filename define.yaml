@@ -1,0 +1,62 @@
+app:
+  name: Gitlab管理
+  tables:
+    - name: Project
+      fields:
+        - field_name: Name
+          type: 1
+        - field_name: ID
+          type: 1
+        - field_name: Description
+          type: 1
+        - field_name: WebUrl
+          type: 15
+      views:
+        - view_name: 全部
+          view_type: grid
+    - name: Issue
+      fields:
+        - field_name: state
+          property:
+            options:
+              - name: opened
+                id: optrhtRl1B
+              - name: closed
+                id: optD9BM0TT
+          type: 3
+        - field_name: created_at
+          property: {}
+          type: 5
+        - field_name: updated_at
+          property: {}
+          type: 5
+        - field_name: due_date
+          property: {}
+          type: 5
+        - field_name: health_status
+          property:
+            options:
+              - name: on_track
+              - name: needs_attention
+              - name: at_risk
+          type: 3
+        - field_name: title
+          type: 1
+        - field_name: ID
+          type: 1
+        - field_name: description
+          type: 1
+      views:
+        - view_name: 全部
+          view_type: grid
+    - name: Member
+      fields:
+        - field_name: name
+          type: 1
+        - field_name: ID
+          type: 1
+        - field_name: username
+          type: 1
+      views:
+        - view_name: 全部
+          view_type: grid
