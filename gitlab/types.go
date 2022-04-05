@@ -1,6 +1,30 @@
 package gitlab
 
-import "time"
+import (
+	"strconv"
+	"time"
+
+	"github.com/geeklubcn/lark/define"
+)
+
+func (i *IssueResult) Convert() *define.Issue {
+	res := &define.Issue{
+		ID:           strconv.Itoa(i.Id),
+		Title:        i.Title,
+		Description:  i.Description,
+		State:        i.State,
+		CreatedAt:    i.CreatedAt,
+		UpdatedAt:    i.UpdatedAt,
+		HealthStatus: i.HealthStatus,
+	}
+	switch i.DueDate.(type) {
+	case string:
+		if dueData, err := time.Parse("2006-01-02", i.DueDate.(string)); err == nil {
+			res.DueDate = dueData
+		}
+	}
+	return res
+}
 
 // IssueResult https://docs.gitlab.com/ee/api/issues.html
 type IssueResult struct {
@@ -90,7 +114,7 @@ type IssueResult struct {
 	Severity           string      `json:"severity"`
 	MovedToId          interface{} `json:"moved_to_id"`
 	ServiceDeskReplyTo interface{} `json:"service_desk_reply_to"`
-	HealthStatus       interface{} `json:"health_status"`
+	HealthStatus       string      `json:"health_status"`
 }
 
 // ProjectResult https://docs.gitlab.com/ee/api/projects.html#get-single-project

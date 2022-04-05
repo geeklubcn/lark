@@ -5,7 +5,7 @@ import "net/http"
 type Domain string
 
 type Gitlab interface {
-	Issues() ([]*IssueResult, error)
+	Issues() (map[string]*IssueResult, error)
 	Project(id string) (*ProjectResult, error)
 }
 
@@ -16,7 +16,7 @@ type gitlab struct {
 	issueLabel string
 }
 
-func New(domain, token, issueLabel string) Gitlab {
+func NewGitlabClient(domain, token, issueLabel string) Gitlab {
 	return &gitlab{
 		domain:     domain,
 		token:      token,

@@ -6,13 +6,14 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 )
 
 const (
 	IssuesPath = "/api/v4/issues"
 )
 
-func (g *gitlab) Issues() ([]*IssueResult, error) {
+func (g *gitlab) Issues() (map[string]*IssueResult, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s%s?labels=%s", g.domain, IssuesPath, g.issueLabel), nil)
 	if err != nil {
 		return nil, err
@@ -31,10 +32,16 @@ func (g *gitlab) Issues() ([]*IssueResult, error) {
 		return nil, err
 	}
 	fmt.Println(string(body))
-	var res = make([]*IssueResult, 0)
-	err = json.Unmarshal(body, &res)
+	var issues = make([]*IssueResult, 0)
+	err = json.Unmarshal(body, &issues)
 	if err != nil {
 		return nil, err
 	}
+
+	res := make(map[string]*IssueResult, 0)
+	for _, it := range issues {
+		res[strconv.Itoa(it.Id)] = it
+	}
+
 	return res, nil
 }
