@@ -16,6 +16,12 @@ app:
           view_type: grid
     - name: Issue
       fields:
+        - field_name: title
+          type: 1
+        - field_name: ID
+          type: 1
+        - field_name: description
+          type: 1
         - field_name: state
           property:
             options:
@@ -40,12 +46,6 @@ app:
               - name: needs_attention
               - name: at_risk
           type: 3
-        - field_name: title
-          type: 1
-        - field_name: ID
-          type: 1
-        - field_name: description
-          type: 1
       views:
         - view_name: 全部
           view_type: grid
