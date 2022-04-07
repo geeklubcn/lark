@@ -70,15 +70,7 @@ func (i *Issue) ToField() map[string]interface{} {
 		"health_status": i.HealthStatus,
 	}
 	if i.ProjectRef != nil {
-		// TODO struct oncall
-		res["Project"] = []map[string]interface{}{
-			{
-				"text":       i.ProjectRef.Text,
-				"type":       i.ProjectRef.Type,
-				"table_id":   i.ProjectRef.TableID,
-				"record_ids": i.ProjectRef.RecordIDs,
-			},
-		}
+		res["project"] = i.ProjectRef.RecordIDs
 	}
 	return res
 }

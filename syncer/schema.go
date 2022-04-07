@@ -3,6 +3,8 @@ package syncer
 import (
 	"context"
 	"encoding/json"
+	"strings"
+
 	"github.com/geeklubcn/lark/define"
 	"github.com/larksuite/oapi-sdk-go/core"
 	larkBitable "github.com/larksuite/oapi-sdk-go/service/bitable/v1"
@@ -145,6 +147,11 @@ func (s *syncer) syncDefineTableField(c context.Context, def *define.Define) err
 							AutoFill:   defField.Property.AutoFill,
 							Multiple:   defField.Property.Multiple,
 							Fields:     defField.Property.Fields,
+						}
+						if strings.HasPrefix(defField.Property.TableId, "$") {
+							if table, tableVarOK := larkTables[strings.TrimPrefix(defField.Property.TableId, "$")]; tableVarOK {
+								f.Property.TableId = table.TableId
+							}
 						}
 					}
 					if i < existLen {

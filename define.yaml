@@ -20,6 +20,11 @@ app:
           type: 1
         - field_name: ID
           type: 1
+        - field_name: project
+          property:
+            multiple: true
+            table_id: $Project
+          type: 18
         - field_name: description
           type: 1
         - field_name: state

@@ -22,7 +22,8 @@ type Config struct {
 }
 
 type BitableConfig struct {
-	AppToken string
+	AppToken   string
+	SyncSchema bool
 }
 type GitlabConfig struct {
 	Domain     string
