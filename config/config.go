@@ -30,7 +30,7 @@ type GitlabConfig struct {
 	IssueLabel string
 }
 
-func Load() {
+func Load() *Config {
 	v := viper.New()
 	v.AutomaticEnv()
 
@@ -47,6 +47,7 @@ func Load() {
 	cfg.AppId = v.GetString(LarkAppId)
 	cfg.AppSecret = v.GetString(LarkAppSecret)
 	cfg.BitableConfig.AppToken = v.GetString(LarkBitableAppToken)
+	return cfg
 }
 
 func GetConfig() *Config {
