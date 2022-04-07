@@ -1,6 +1,9 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+	"time"
+)
 
 var cfg = &Config{}
 
@@ -12,11 +15,14 @@ const (
 	LarkGitlabDomain     = "LARK_GITLAB_DOMAIN"
 	LarkGitlabToken      = "LARK_GITLAB_TOKEN"
 	LarkGitlabIssueLabel = "LARK_GITLAB_ISSUE_LABEL"
+
+	LarkSyncPeriod = "LARK_SYNC_PERIOD"
 )
 
 type Config struct {
-	AppId     string
-	AppSecret string
+	AppId      string
+	AppSecret  string
+	SyncPeriod time.Duration
 	GitlabConfig
 	BitableConfig
 }
@@ -34,20 +40,25 @@ type GitlabConfig struct {
 func Load() *Config {
 	v := viper.New()
 	v.AutomaticEnv()
+	v.SetDefault(LarkSyncPeriod, "60s")
+	v.SetDefault(LarkGitlabIssueLabel, "lark")
 
+	_ = v.BindEnv(LarkAppId)
+	_ = v.BindEnv(LarkAppSecret)
+	_ = v.BindEnv(LarkSyncPeriod)
+	_ = v.BindEnv(LarkBitableAppToken)
 	_ = v.BindEnv(LarkGitlabDomain)
 	_ = v.BindEnv(LarkGitlabToken)
 	_ = v.BindEnv(LarkGitlabIssueLabel)
+
+	cfg.AppId = v.GetString(LarkAppId)
+	cfg.AppSecret = v.GetString(LarkAppSecret)
+	cfg.SyncPeriod = v.GetDuration(LarkSyncPeriod)
+	cfg.BitableConfig.AppToken = v.GetString(LarkBitableAppToken)
 	cfg.GitlabConfig.Domain = v.GetString(LarkGitlabDomain)
 	cfg.GitlabConfig.Token = v.GetString(LarkGitlabToken)
 	cfg.GitlabConfig.IssueLabel = v.GetString(LarkGitlabIssueLabel)
 
-	_ = v.BindEnv(LarkAppId)
-	_ = v.BindEnv(LarkAppSecret)
-	_ = v.BindEnv(LarkBitableAppToken)
-	cfg.AppId = v.GetString(LarkAppId)
-	cfg.AppSecret = v.GetString(LarkAppSecret)
-	cfg.BitableConfig.AppToken = v.GetString(LarkBitableAppToken)
 	return cfg
 }
 

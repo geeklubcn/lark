@@ -4,6 +4,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+	"time"
 )
 
 func TestConfig(t *testing.T) {
@@ -17,4 +18,15 @@ func TestConfig(t *testing.T) {
 		assert.Equal(t, "abc", GetConfig().Token)
 	})
 
+	t.Run("config default val", func(t *testing.T) {
+		_ = os.Unsetenv(LarkGitlabIssueLabel)
+		Load()
+		assert.Equal(t, "lark", GetConfig().IssueLabel)
+		assert.Equal(t, 60*time.Second, GetConfig().SyncPeriod)
+
+		_ = os.Setenv(LarkSyncPeriod, "10m")
+		defer func() { _ = os.Unsetenv(LarkSyncPeriod) }()
+		Load()
+		assert.Equal(t, 10*time.Minute, GetConfig().SyncPeriod)
+	})
 }
