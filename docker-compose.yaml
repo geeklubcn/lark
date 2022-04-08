@@ -1,0 +1,16 @@
+version: '3'
+services:
+  lark:
+    image: geeklubcn/lark:v20220408
+    environment:
+      - LARK_APP_ID=cli_aaa
+      - LARK_APP_SECRET=6nbbb
+      - LARK_BITABLE_APP_TOKEN=bascnE9ccc
+      - LARK_GITLAB_DOMAIN=https://gitlab.com
+      - LARK_GITLAB_TOKEN=glpat-RGA_ddd
+      # filter issue by label. SYNC_ALL will fetch all issue
+      - LARK_GITLAB_ISSUE_LABEL=SYNC_ALL
+      # LARK_SYNC_PERIOD default 60s
+      - LARK_SYNC_PERIOD=10s
+      # LARK_LOG_LEVEL default info
+      - LARK_LOG_LEVEL=debug
