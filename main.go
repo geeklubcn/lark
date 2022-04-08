@@ -13,9 +13,12 @@ import (
 
 func main() {
 	cfg := config.Load()
+	logrus.SetLevel(cfg.LogLevel)
 	g := gitlab.NewGitlabClient(cfg.Domain, cfg.Token, cfg.IssueLabel)
 	b := bitable.NewBitable(cfg.AppId, cfg.AppSecret, cfg.AppToken)
 	s := syncer.NewSyncer(b, g)
+
+	logrus.Info("============LARK RUNNING============")
 
 	dsl, _ := define.NewParser().Parse("./define.yaml")
 	_ = s.SyncSchemaToRemoteBitable(context.Background(), &dsl)
