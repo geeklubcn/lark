@@ -10,11 +10,16 @@ import (
 )
 
 const (
-	IssuesPath = "/api/v4/issues"
+	IssuesPath   = "/api/v4/issues"
+	SyncAllLabel = "SYNC_ALL"
 )
 
 func (g *gitlab) Issues() (map[string]*IssueResult, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s%s?labels=%s", g.domain, IssuesPath, g.issueLabel), nil)
+	url := fmt.Sprintf("%s%s", g.domain, IssuesPath)
+	if g.issueLabel != SyncAllLabel {
+		url = fmt.Sprintf("%s?labels=%s", url, g.issueLabel)
+	}
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
