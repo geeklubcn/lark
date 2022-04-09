@@ -2,6 +2,8 @@
 
 通过**飞书多维表格(Bitable)**管理**Gitlab Issue**
 
+目前为`Gitlab->Bitable`单向同步，Bitable的变更不会同步到Gitlab
+
 ## 配置说明
 
 ### 飞书配置
